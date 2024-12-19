@@ -1,0 +1,92 @@
+[
+  {
+    "id": "1",
+    "name": "System Management",
+    "parent": null
+  },
+  {
+    "id": "2",
+    "name": "Systems",
+    "parent": "1"
+  },
+  {
+    "id": "3",
+    "name": "System Code",
+    "parent": "2"
+  },
+  {
+    "id": "4",
+    "name": "Code Registration",
+    "parent": "3"
+  },
+  {
+    "id": "5",
+    "name": "Code Registration 2",
+    "parent": "2"
+  },
+  {
+    "id": "6",
+    "name": "Properties",
+    "parent": "2"
+  },
+  {
+    "id": "7",
+    "name": "Menus",
+    "parent": "2"
+  },
+  {
+    "id": "8",
+    "name": "Code Registration",
+    "parent": "7"
+  },
+  {
+    "id": "9",
+    "name": "API List",
+    "parent": "2"
+  },
+  {
+    "id": "10",
+    "name": "API Registration",
+    "parent": "9"
+  },
+  {
+    "id": "11",
+    "name": "API Edit",
+    "parent": "9"
+  },
+  {
+    "id": "12",
+    "name": "Users & Groups",
+    "parent": "1"
+  },
+  {
+    "id": "13",
+    "name": "Users",
+    "parent": "12"
+  },
+  {
+    "id": "14",
+    "name": "New Menu",
+    "parent": "1"
+  },
+  {
+    "id": "15",
+    "name": "New Menu",
+    "parent": "14"
+  },
+  {
+    "id": "16",
+    "name": "New Menu",
+    "parent": "15"
+  },
+  {
+    "id": "17",
+    "name": "New Menu",
+    "parent": "16"
+  },
+  {
+    "id": "18",
+    "name": "New Menu",
+    "parent": 13
+  }
+]

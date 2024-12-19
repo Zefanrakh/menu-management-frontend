@@ -1,0 +1,99 @@
+[
+    {
+        "id": "1",
+        "name": "System Management",
+        "depth": 1,
+        "parent": null,
+        "children": [
+            {
+                "id": "2",
+                "name": "Systems",
+                "depth": 2,
+                "parent": "1",
+                "children": [
+                    {
+                        "id": "3",
+                        "name": "System Code",
+                        "depth": 3,
+                        "parent": "2",
+                        "children": [
+                            {
+                                "id": "4",
+                                "name": "Code Registration",
+                                "depth": 4,
+                                "parent": "3",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5",
+                        "name": "Code Registration 2",
+                        "depth": 3,
+                        "parent": "2",
+                        "children": []
+                    },
+                    {
+                        "id": "6",
+                        "name": "Properties",
+                        "depth": 3,
+                        "parent": "2",
+                        "children": []
+                    },
+                    {
+                        "id": "7",
+                        "name": "Menus",
+                        "depth": 3,
+                        "parent": "2",
+                        "children": [
+                            {
+                                "id": "8",
+                                "name": "Code Registration",
+                                "depth": 4,
+                                "parent": "7",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "id": "9",
+                        "name": "API List",
+                        "depth": 3,
+                        "parent": "2",
+                        "children": [
+                            {
+                                "id": "10",
+                                "name": "API Registration",
+                                "depth": 4,
+                                "parent": "9",
+                                "children": []
+                            },
+                            {
+                                "id": "11",
+                                "name": "API Edit",
+                                "depth": 4,
+                                "parent": "9",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "12",
+                "name": "Users & Groups",
+                "depth": 2,
+                "parent": "1",
+                "children": [
+                    {
+                        "id": "13",
+                        "name": "Users",
+                        "depth": 3,
+                        "parent": "12",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+]
