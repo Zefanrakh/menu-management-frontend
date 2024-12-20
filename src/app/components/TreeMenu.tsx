@@ -25,6 +25,7 @@ const TreeMenu = () => {
   } = useSelector((state: RootState) => state.menuReducer);
   const [treeData, setTreeData] = useState<TreeDataNode[]>([]);
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
   useEffect(() => {
     dispatch(fetchMenus());
@@ -48,6 +49,7 @@ const TreeMenu = () => {
 
   const handleSelectMenu = (menu: MenuItem) => {
     dispatch(selectMenu(menu.id));
+    router.push(`/menus/${menu.id}`);
   };
 
   const handleOnExpand = (keys: Key[]) => {
