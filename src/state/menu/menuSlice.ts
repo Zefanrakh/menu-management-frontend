@@ -1,13 +1,17 @@
 import { MenuItem } from "@/type/menuItem";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "@/lib/axios";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { generateTree } from "@/shared/utils/generateTree";
+import { flattenTree } from "@/shared/utils/flattenTree";
+import { deleteMenu, fetchMenus, postMenu, putMenu } from "./asyncThunk";
 
-interface MenuState {
+export interface MenuState {
   menuTree: MenuItem[];
   status: string;
   rawMenus: MenuItem[];
   selectedMenu?: MenuItem;
   expandedKeys?: number[];
+  newlyAddedMenu?: MenuItem;
+  recentlyDeletedMenu?: MenuItem;
 }
 
 const initialState: MenuState = {
@@ -17,69 +21,7 @@ const initialState: MenuState = {
   expandedKeys: [],
 };
 
-function generateTree(rawMenus: MenuItem[]) {
-  let insertedIds: number[] = [];
-
-  const parentMenus = rawMenus.filter((parent) => !parent.parent);
-
-  function getTree(menus: MenuItem[], depth = 1): MenuItem[] {
-    let branches = [];
-    for (const menu of menus) {
-      if (insertedIds.includes(menu.id)) {
-        continue;
-      } else {
-        insertedIds.push(menu.id);
-        const children = rawMenus.filter((m) => m.parent === menu.id);
-        menu.depth = depth;
-        menu.children = getTree(children, depth + 1);
-        branches.push(menu);
-      }
-    }
-    return branches;
-  }
-
-  return getTree(parentMenus);
-}
-
-function flattenTree(menuTree: MenuItem[]): MenuItem[] {
-  return menuTree.flatMap((menu) => [
-    menu,
-    ...flattenTree(menu?.children ?? []),
-  ]);
-}
-
-export const fetchMenus = createAsyncThunk("menus/fetchMenus", async () => {
-  const res = await axios.get("/menu");
-  return res.data;
-});
-
-export const postMenu = createAsyncThunk(
-  "menus/postMenu",
-  async (
-    payload: {
-      name: string;
-      parent: string;
-    },
-    thunkAPI
-  ) => {
-    const res = await axios.post("/menu", payload);
-    thunkAPI.dispatch(fetchMenus());
-  }
-);
-
-export const putMenu = createAsyncThunk(
-  "menus/putMenu",
-  async (
-    payload: {
-      id: string;
-      name: string;
-    },
-    thunkAPI
-  ) => {
-    const res = await axios.put(`/menu/${payload.id}`, payload);
-    thunkAPI.dispatch(fetchMenus());
-  }
-);
+/* ------------------------------ SLICE -------------------------------- */
 
 const menuSlice = createSlice({
   name: "menus",
@@ -98,6 +40,9 @@ const menuSlice = createSlice({
     setExpandedKeys(state: MenuState, action: PayloadAction<number[]>) {
       state.expandedKeys = action.payload;
     },
+    setRecentlyDeletedMenu(state: MenuState, action: PayloadAction<MenuItem>) {
+      state.recentlyDeletedMenu = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -111,12 +56,19 @@ const menuSlice = createSlice({
           state.rawMenus = flattenTree(state.menuTree);
           state.expandedKeys = state.rawMenus.map((menu) => menu.id);
           state.status = "success";
+          if (state.newlyAddedMenu) {
+            state.selectedMenu = state.rawMenus.find(
+              (menu) => menu.id === state.newlyAddedMenu?.id
+            );
+            state.newlyAddedMenu = undefined;
+          }
         }
       )
       .addCase(postMenu.pending, (state) => {
         console.log("postMenu pending");
       })
-      .addCase(postMenu.fulfilled, (state, action) => {
+      .addCase(postMenu.fulfilled, (state, action: PayloadAction<MenuItem>) => {
+        state.newlyAddedMenu = action.payload;
         state.status = "success";
       })
       .addCase(putMenu.pending, (state) => {
@@ -124,11 +76,36 @@ const menuSlice = createSlice({
       })
       .addCase(putMenu.fulfilled, (state, action) => {
         state.status = "success";
+      })
+      .addCase(deleteMenu.pending, (state) => {
+        console.log("deleteMenu pending");
+      })
+      .addCase(deleteMenu.fulfilled, (state, action) => {
+        const { recentlyDeletedMenu } = state;
+        const selectedMenuCandidates = state.rawMenus.filter((menu) => {
+          let isSameParent = menu.parent === recentlyDeletedMenu?.parent;
+          let idIsBeforeDeletedMenuId =
+            recentlyDeletedMenu?.id && menu.id < recentlyDeletedMenu.id;
+          return idIsBeforeDeletedMenuId && isSameParent;
+        });
+        if (selectedMenuCandidates.length) {
+          state.selectedMenu =
+            selectedMenuCandidates[selectedMenuCandidates.length - 1];
+        } else if (recentlyDeletedMenu?.parent) {
+          state.selectedMenu = state.rawMenus.find(
+            (menu) => menu.id === recentlyDeletedMenu.parent
+          );
+        }
+        state.status = "success";
       });
   },
 });
 
-export const { selectMenu, setExpandedAll, setExpandedKeys } =
-  menuSlice.actions;
+export const {
+  selectMenu,
+  setExpandedAll,
+  setExpandedKeys,
+  setRecentlyDeletedMenu,
+} = menuSlice.actions;
 
 export default menuSlice.reducer;

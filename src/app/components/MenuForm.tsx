@@ -1,26 +1,34 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Button, Form, Input } from "antd";
+import { App, Button, Form, Input } from "antd";
 import { MenuItem } from "@/type/menuItem";
 import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
-import { putMenu, selectMenu } from "@/state/menu/menuSlice";
+import { selectMenu } from "@/state/menu/menuSlice";
+import { useRouter } from "next/navigation";
+import { putMenu } from "@/state/menu/asyncThunk";
 
 const MenuForm: React.FC = () => {
   /* ----------------------------- HOOK -------------------------------- */
 
+  const { notification } = App.useApp();
   const [form] = Form.useForm<MenuItem>();
   const { menuId } = useParams();
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { selectedMenu, rawMenus } = useSelector(
     (state: RootState) => state.menuReducer
   );
 
   useEffect(() => {
-    dispatch(selectMenu(Number(menuId)));
-  }, [menuId, rawMenus]);
+    if (selectedMenu && selectedMenu.id.toString() !== menuId) {
+      router.push(`/menus/${selectedMenu.id}`);
+    } else if (!selectedMenu && menuId) {
+      dispatch(selectMenu(Number(menuId)));
+    }
+  }, [selectedMenu, menuId, rawMenus]);
 
   useEffect((): void => {
     form.setFieldsValue({
@@ -32,6 +40,22 @@ const MenuForm: React.FC = () => {
   }, [form, selectedMenu]);
 
   /* ---------------------------- FUNCTION ------------------------------- */
+
+  const handleSuccessNotif = (message: string) => {
+    notification.success({
+      message: "Success",
+      description: message,
+      placement: "topRight",
+    });
+  };
+
+  const handleErrorNotif = (message: string) => {
+    notification.error({
+      message: "Error",
+      description: message,
+      placement: "topRight",
+    });
+  };
 
   const onFinish = (values: any) => {
     dispatch(putMenu(values));

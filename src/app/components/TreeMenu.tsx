@@ -1,10 +1,10 @@
 "use client";
 
 import React, { ReactNode, useEffect, useState } from "react";
-import { Button, ConfigProvider, Tree } from "antd";
+import { ConfigProvider, Tree } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
-import { fetchMenus, setExpandedKeys } from "@/state/menu/menuSlice";
+import { selectMenu, setExpandedKeys } from "@/state/menu/menuSlice";
 import { DownOutlined } from "@ant-design/icons";
 import type { TreeDataNode } from "antd";
 import { MenuItem } from "@/type/menuItem";
@@ -13,16 +13,18 @@ import { useRouter } from "next/navigation";
 import { DataNode, EventDataNode } from "antd/es/tree";
 import TitleRenderer from "./TitleRenderer";
 import { Key } from "antd/es/table/interface";
+import { fetchMenus } from "@/state/menu/asyncThunk";
 
 const TreeMenu = () => {
   /* ------------------------------ HOOKS ------------------------------ */
 
-  const { menuTree: menus, expandedKeys } = useSelector(
-    (state: RootState) => state.menuReducer
-  );
+  const {
+    menuTree: menus,
+    expandedKeys,
+    selectedMenu,
+  } = useSelector((state: RootState) => state.menuReducer);
   const [treeData, setTreeData] = useState<TreeDataNode[]>([]);
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
 
   useEffect(() => {
     dispatch(fetchMenus());
@@ -45,7 +47,7 @@ const TreeMenu = () => {
   /** -------------------------- FUNCTIONS ------------------------------ */
 
   const handleSelectMenu = (menu: MenuItem) => {
-    router.push(`/menus/${menu.id}`);
+    dispatch(selectMenu(menu.id));
   };
 
   const handleOnExpand = (keys: Key[]) => {
@@ -71,7 +73,7 @@ const TreeMenu = () => {
     );
   };
 
-  const titleRenderer = (nodeData: any) => {
+  const titleRenderer = (nodeData: TreeDataNode) => {
     return <TitleRenderer nodeData={nodeData} />;
   };
 
@@ -87,6 +89,7 @@ const TreeMenu = () => {
         }}
       >
         <Tree
+          selectedKeys={[selectedMenu?.id as Key]}
           expandedKeys={expandedKeys}
           onExpand={handleOnExpand}
           showLine
